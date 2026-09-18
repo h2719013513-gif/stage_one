@@ -205,7 +205,7 @@ Expand-Archive MinGit.zip -DestinationPath E:\tools\MinGit
 git --version   # git version 2.55.0.windows.5
 ```
 
-### 2. 提交记录（共 7 次有意义的提交）
+### 2. 提交记录（共 8 次有意义的提交，满足"至少三次"的要求）
 
 | 序号 | 提交内容 |
 | --- | --- |
@@ -216,6 +216,7 @@ git --version   # git version 2.55.0.windows.5
 | 5 | 实验 2：提交处理后的数据、统计指标表与四张图表 |
 | 6 | 文档：补充 README 运行方法、环境配置与 CPU/GPU 区别 |
 | 7 | 文档：补充本机实测环境信息 |
+| 8 | 实验 2：优化等级分布饼图（过滤人数为 0 的等级，避免标签重叠） |
 
 查看提交记录：
 

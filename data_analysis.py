@@ -217,12 +217,15 @@ def plot_score_boxplot(data: pd.DataFrame, fig_dir: Path) -> Path:
 def plot_grade_pie(data: pd.DataFrame, fig_dir: Path) -> Path:
     """图 4：成绩等级分布饼图。"""
     counts = data["等级"].value_counts().reindex(GRADE_LABELS).fillna(0)
+    # 人数为 0 的等级不画，否则标签会挤在一起
+    counts = counts[counts > 0]
+    color_map = dict(zip(GRADE_LABELS, PALETTE + ["#937860"]))
     fig, ax = plt.subplots(figsize=(7, 5.5))
     _, _, autotexts = ax.pie(
         counts,
         labels=[f"{label}\n{int(count)} 人" for label, count in counts.items()],
         autopct="%1.1f%%",
-        colors=PALETTE + ["#937860"],
+        colors=[color_map[label] for label in counts.index],
         startangle=90,
         counterclock=False,
         wedgeprops={"edgecolor": "white"},
