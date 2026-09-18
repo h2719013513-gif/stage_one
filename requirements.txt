@@ -1,0 +1,13 @@
+# 实验环境依赖（在 conda 环境 py 中安装）
+#   conda activate py
+#   pip install -r requirements.txt
+#
+# 说明：torch 需要 CUDA 版时请单独安装，例如：
+#   pip install torch --index-url https://download.pytorch.org/whl/cu126
+# 国内网络可加清华镜像加速：
+#   pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+numpy>=2.0
+pandas>=2.2
+matplotlib>=3.9
+torch>=2.6
