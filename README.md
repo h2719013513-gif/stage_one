@@ -22,6 +22,21 @@ stage_one/
 
 ## 二、环境配置说明
 
+### 0. 本机实测环境（2026-09-18 验证通过）
+
+> 本机 C 盘空间紧张，因此 **conda 环境、Git、下载缓存全部放在 E 盘**，仅项目代码放在工作目录。
+
+| 项目 | 实测结果 |
+| --- | --- |
+| Anaconda / conda | 26.5.3，安装于 `E:\anaconda3` |
+| conda 环境 `py` | `E:\conda_envs\py`，路径已加入 `envs_dirs`，可直接 `conda activate py` |
+| Python | 3.11.16 |
+| PyTorch | 2.14.0+cu126（编译 CUDA 12.6） |
+| CUDA 是否可用 | **是**，NVIDIA GeForce RTX 3050 Laptop GPU（4.0 GB 显存），cuDNN 91002 |
+| numpy / pandas / matplotlib | 2.4.6 / 3.0.6 / 3.11.2 |
+| Git | MinGit 2.55.0.windows.5，安装于 `E:\tools\MinGit`，已加入用户 PATH |
+| 显卡驱动 | 591.74 |
+
 ### 1. 创建 conda 环境
 
 实验使用 **conda 环境 `py`**（Python 3.11）。本机环境位置：`E:\conda_envs\py`。
@@ -33,10 +48,14 @@ conda create -n py python=3.11 pip -y
 # 方式二：安装到指定目录（本机采用的方式，E 盘空间充足）
 conda create -p E:\conda_envs\py python=3.11 pip -y
 
+# 让 conda 能按名字找到该目录下的环境
+conda config --add envs_dirs E:\conda_envs
+
 conda activate py
 ```
 
-> 注意：本机 conda 的 libmamba 求解器取索引异常，创建环境时需追加 `--solver=classic`。
+> 注意：本机 conda 的 libmamba 求解器取索引异常（会误报 python/pip 不存在），
+> 创建环境时需追加 `--solver=classic`。
 > 国内网络下载慢时可加清华镜像：
 > `-c https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/ --override-channels`
 
@@ -50,6 +69,16 @@ pip install numpy pandas matplotlib -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # PyTorch（CUDA 12.6 版，适配本机 NVIDIA GeForce RTX 3050 Laptop GPU）
 pip install torch --index-url https://download.pytorch.org/whl/cu126
+```
+
+如果官方源速度太慢（本机实测仅 1 MB/s 左右），可以从国内镜像下载 wheel 后再本地安装：
+
+```bash
+# 上海交大镜像实测约 6~11 MB/s，约 2.4 GB
+curl.exe -L -o torch-2.14.0+cu126-cp311-cp311-win_amd64.whl ^
+  "https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torch-2.14.0%2Bcu126-cp311-cp311-win_amd64.whl"
+
+pip install --no-cache-dir torch-2.14.0+cu126-cp311-cp311-win_amd64.whl
 ```
 
 如果只是 CPU 环境（没有 NVIDIA 显卡），用 CPU 版即可：
@@ -69,6 +98,17 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```bash
 conda activate py
 python check_env.py
+```
+
+本机实测输出（节选）：
+
+```
+Python 版本   : 3.11.16
+PyTorch 版本  : 2.14.0+cu126
+编译所用 CUDA : 12.6
+是否支持 CUDA : 是
+  显卡 0       : NVIDIA GeForce RTX 3050 Laptop GPU（显存 4.0 GB）
+cuDNN 版本    : 91002
 ```
 
 ## 三、实验 1：环境检测程序 `check_env.py`
@@ -146,18 +186,49 @@ python data_analysis.py \
 
 ## 五、实验 3：Git 项目管理
 
-### 1. 初始化与提交
+### 1. Git 安装
 
-```bash
-git init
-git add .
-git commit -m "提交实验一环境检测程序 check_env.py"
-git commit -m "提交实验二数据处理程序 data_analysis.py 与数据集"
-git commit -m "提交实验二统计图表与处理结果"
-git commit -m "补充 README 环境配置说明"
+本机原本没有安装 Git，且当前账号不在管理员组（无法写入 `C:\Program Files`），
+因此部署官方 **MinGit 2.55.0.windows.5** 便携版到 E 盘并加入用户 PATH：
+
+```powershell
+# 下载（国内镜像）
+curl.exe -L -o MinGit.zip "https://registry.npmmirror.com/-/binary/git-for-windows/v2.55.0.windows.5/MinGit-2.55.0.5-64-bit.zip"
+
+# 解压到 E 盘
+Expand-Archive MinGit.zip -DestinationPath E:\tools\MinGit
+
+# 加入用户 PATH（新开终端后即可直接使用 git 命令）
+[Environment]::SetEnvironmentVariable('Path',
+    [Environment]::GetEnvironmentVariable('Path','User') + ';E:\tools\MinGit\cmd', 'User')
+
+git --version   # git version 2.55.0.windows.5
 ```
 
-### 2. 关联远程仓库并推送
+### 2. 提交记录（共 7 次有意义的提交）
+
+| 序号 | 提交内容 |
+| --- | --- |
+| 1 | 初始化仓库：添加 `.gitignore` 与依赖清单 `requirements.txt` |
+| 2 | 实验 1：新增环境检测程序 `check_env.py` |
+| 3 | 实验 2：新增数据生成脚本与原始数据集（122 条，含脏数据） |
+| 4 | 实验 2：新增数据处理与可视化程序 `data_analysis.py` |
+| 5 | 实验 2：提交处理后的数据、统计指标表与四张图表 |
+| 6 | 文档：补充 README 运行方法、环境配置与 CPU/GPU 区别 |
+| 7 | 文档：补充本机实测环境信息 |
+
+查看提交记录：
+
+```bash
+git log --oneline --graph
+git log --stat
+```
+
+> 说明：仓库当前使用的提交者邮箱是占位邮箱 `hebinjie@example.com`，推送前请改成自己的邮箱：
+> `git config user.email "你的邮箱"`
+> （如需修改已有提交的作者信息：`git rebase --root --exec "git commit --amend --reset-author --no-edit"`）
+
+### 3. 关联远程仓库并推送
 
 在 GitHub / Gitee 上新建空仓库后：
 
@@ -167,11 +238,8 @@ git branch -M main
 git push -u origin main
 ```
 
-### 3. 查看提交记录
-
-```bash
-git log --oneline --graph
-```
+首次推送可能需要登录：GitHub 使用 **Personal Access Token**（Settings → Developer settings → Tokens），
+Gitee 可使用账号密码或私人令牌。
 
 ## 六、CPU 与 GPU 的区别（验收问答）
 
