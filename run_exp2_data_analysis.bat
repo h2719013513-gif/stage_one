@@ -1,18 +1,18 @@
 @echo off
-chcp 936 >nul
+chcp 65001 >nul
 set MPLCONFIGDIR=E:\conda_cache\matplotlib
 cd /d "%~dp0"
 echo ============================================================
-echo  ÊµÑé 2£ºPython Êý¾Ý´¦ÀíÓë¿ÉÊÓ»¯
-echo  ½âÊÍÆ÷£ºE:\conda_envs\py\python.exe
+echo  å®žéªŒ 2ï¼šPython æ•°æ®å¤„ç†ä¸Žå¯è§†åŒ–
+echo  è§£é‡Šå™¨ï¼šE:\conda_envs\py\python.exe
 echo ============================================================
 echo.
 E:\conda_envs\py\python.exe data_analysis.py
 echo.
 echo ------------------------------------------------------------
-echo  ´¦Àí½á¹û£ºdata\processed\students_scores_clean.csv
+echo  å¤„ç†ç»“æžœï¼šdata\processed\students_scores_clean.csv
 echo             output\statistics_summary.csv
-echo             output\figures\  (4 ÕÅÍ¼)
-echo  ÔËÐÐ½áÊø£¬°´ÈÎÒâ¼ü¹Ø±Õ±¾´°¿Ú¡£
+echo             output\figures\  (4 å¼ å›¾)
+echo  è¿è¡Œç»“æŸï¼ŒæŒ‰ä»»æ„é”®å…³é—­æœ¬çª—å£ã€‚
 echo ------------------------------------------------------------
 pause >nul
