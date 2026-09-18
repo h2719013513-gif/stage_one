@@ -3,6 +3,8 @@
 本仓库是《深度学习》课程第一阶段（实验 1～3）的提交成果，包含环境检测程序、
 数据处理与可视化程序、数据集、图表结果以及环境配置说明。
 
+**仓库地址：** https://github.com/h2719013513-gif/stage_one
+
 ## 一、目录结构
 
 ```
@@ -205,7 +207,7 @@ Expand-Archive MinGit.zip -DestinationPath E:\tools\MinGit
 git --version   # git version 2.55.0.windows.5
 ```
 
-### 2. 提交记录（共 8 次有意义的提交，满足"至少三次"的要求）
+### 2. 提交记录（共 9 次有意义的提交，满足"至少三次"的要求）
 
 | 序号 | 提交内容 |
 | --- | --- |
@@ -217,6 +219,7 @@ git --version   # git version 2.55.0.windows.5
 | 6 | 文档：补充 README 运行方法、环境配置与 CPU/GPU 区别 |
 | 7 | 文档：补充本机实测环境信息 |
 | 8 | 实验 2：优化等级分布饼图（过滤人数为 0 的等级，避免标签重叠） |
+| 9 | 文档：补充远程仓库地址与提交者信息 |
 
 查看提交记录：
 
@@ -225,9 +228,9 @@ git log --oneline --graph
 git log --stat
 ```
 
-> 说明：仓库当前使用的提交者邮箱是占位邮箱 `hebinjie@example.com`，推送前请改成自己的邮箱：
-> `git config user.email "你的邮箱"`
-> （如需修改已有提交的作者信息：`git rebase --root --exec "git commit --amend --reset-author --no-edit"`）
+> 提交者信息：`贺斌杰 <h2719013513-gif@users.noreply.github.com>`（GitHub 提供的 noreply 邮箱）。
+> 如需更换邮箱：`git config user.email "你的邮箱"`，已有提交可用
+> `git rebase --root --exec "git commit --amend --reset-author --no-edit"` 重写作者信息。
 
 ### 3. 关联远程仓库并推送
 
