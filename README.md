@@ -1,7 +1,9 @@
-# 深度学习实验一阶段：环境搭建 · 数据处理 · Git 管理
+# 深度学习实验：环境搭建 · 数据处理 · 张量与神经网络 · Git 管理
 
-本仓库是《深度学习》课程第一阶段（实验 1～3）的提交成果，包含环境检测程序、
-数据处理与可视化程序、数据集、图表结果以及环境配置说明。
+本仓库是《深度学习》课程的实验提交成果，包含两个阶段：
+
+- **第一阶段（实验 1～3）**：环境检测程序、数据处理与可视化、Git 项目管理；
+- **第二阶段（实验 4～6）**：PyTorch 张量与自动求导、从零实现线性回归训练、不同学习率的训练过程分析。
 
 **仓库地址：** https://github.com/h2719013513-gif/stage_one
 
@@ -11,11 +13,23 @@
 stage_one/
 ├── check_env.py                     实验 1：深度学习开发环境检测程序
 ├── data_analysis.py                 实验 2：数据读取 / 清洗 / 统计 / 可视化
+├── tensor_practice.py               实验 4：张量操作与自动求导练习
+├── linear_regression.py             实验 5：线性回归完整训练（含 Loss 曲线与预测对比图）
+├── learning_rate_analysis.py        实验 6：不同学习率的训练过程对比与分析
+├── 实验6_学习率分析.md               实验 6 的分析报告
+├── 实验步骤与常见问题.md             大白话版操作手册（怎么跑、出错怎么办）
+├── run_exp1_env_check.bat           一键运行脚本（双击即可，下同）
+├── run_exp2_data_analysis.bat
+├── run_exp4_tensor_practice.bat
+├── run_exp5_linear_regression.bat
+├── run_exp6_learning_rate.bat
 ├── data/
 │   ├── raw/students_scores_raw.csv        原始数据（含缺失值、异常值、重复记录）
 │   └── processed/students_scores_clean.csv 清洗后的数据
 ├── output/
-│   ├── figures/                            统计图表（PNG）
+│   ├── figures/                            所有图表（PNG）
+│   ├── 实验5_训练日志.csv                   实验 5 的每轮 Loss
+│   ├── 实验6_不同学习率Loss数据.csv          实验 6 的曲线原始数据
 │   └── statistics_summary.csv              平均值 / 最大值 / 最小值 / 标准差等
 ├── scripts/generate_dataset.py      原始数据生成脚本（固定随机种子，可复现）
 ├── requirements.txt                 依赖清单
@@ -245,7 +259,115 @@ git push -u origin main
 首次推送可能需要登录：GitHub 使用 **Personal Access Token**（Settings → Developer settings → Tokens），
 Gitee 可使用账号密码或私人令牌。
 
-## 六、CPU 与 GPU 的区别（验收问答）
+## 六、实验 4：张量与自动求导 `tensor_practice.py`
+
+运行方式：
+
+```bash
+python tensor_practice.py
+```
+
+代码用 5 个函数对应实验要求的 5 件事：
+
+| 实验要求 | 对应函数 | 做了什么 |
+| --- | --- | --- |
+| 创建不同维度的 Tensor | `demo_create_tensors()` | 0 维标量、1 维向量、2 维矩阵、3 维张量、4 维（一批图片），并演示 `arange/linspace/zeros/ones/eye/randn` |
+| 加法、乘法、矩阵乘法 | `demo_basic_ops()` | `a + b`、`a * b`（逐元素）、`a @ b`（矩阵乘法）、广播、统计运算 |
+| Tensor 维度变换 | `demo_reshape()` | `reshape/view/unsqueeze/squeeze/transpose/permute/flatten/cat/stack`，每一步都打印形状变化 |
+| y = wx + b 求梯度 | `demo_autograd()` | 用 `requires_grad=True` 建 w、b，`loss.backward()` 自动求导，并与手算结果对照 |
+| 修改参数观察输出 | `demo_change_params()` | 先手动换不同 (w, b) 看输出怎么变；再沿着梯度反方向更新参数，观察 Loss 逐轮下降 |
+
+自动求导的关键输出（与手算完全一致）：
+
+```
+反向传播后：w.grad = 10.0，b.grad = 4.0
+手算验证：
+  d(loss)/dw = x1 + x2 + x3 + x4 = 10.0  -> 与 w.grad 一致
+  d(loss)/db = 1 + 1 + 1 + 1 = 4  -> 与 b.grad 一致
+```
+
+修改参数后 Loss 的变化（每轮更新后打印）：
+
+```
+  轮次         w         b       Loss（更新后）
+   0    0.5000    0.0000         25.3750
+   1    1.8750    0.4750          0.7209
+   5    2.1383    0.5928          0.0277
+```
+
+## 七、实验 5：从零实现线性回归 `linear_regression.py`
+
+运行方式：
+
+```bash
+python linear_regression.py                 # 默认学习率 0.1，训练 200 轮
+python linear_regression.py --lr 0.05 --epochs 300
+```
+
+训练流程完全手写，没有用任何现成回归函数：
+
+1. `generate_data()`：生成 200 个带噪声的样本，真实规律 `y = 2.5x + 1.2`，噪声标准差 0.8；
+2. `build_model()`：`nn.Linear(1, 1)`，就是 y = wx + b；
+3. `train()`：标准五步循环 —— 前向传播 → 算 Loss → `optimizer.zero_grad()` → `loss.backward()` → `optimizer.step()`；
+4. 损失函数用 `nn.MSELoss()`，优化器用 `torch.optim.SGD`；
+5. 训练完输出 Loss 曲线和「预测 vs 真实」对比图。
+
+实测结果（学习率 0.1、200 轮）：
+
+| 项目 | 数值 |
+| --- | --- |
+| 初始 Loss | 19.316862 |
+| 最终 Loss | 0.506008 |
+| 真实参数 | w = 2.5，b = 1.2 |
+| 学到的参数 | w = 2.5011，b = 1.3060 |
+
+> Loss 从 19.32 降到 0.506，已经接近噪声带来的理论下限（0.8² ≈ 0.64），
+> 说明模型确实学到了数据背后的真实规律，而不是死记数据点。
+
+输出文件：
+
+| 文件 | 内容 |
+| --- | --- |
+| `output/figures/实验5_Loss曲线.png` | Loss 随训练轮次变化的曲线（纵轴对数坐标） |
+| `output/figures/实验5_预测结果对比.png` | 训练数据散点 + 真实规律直线 + 模型预测直线 |
+| `output/实验5_训练日志.csv` | 每一轮的 epoch 与 loss，可在 Excel 里自己画图 |
+
+## 八、实验 6：不同学习率的训练过程分析 `learning_rate_analysis.py`
+
+运行方式：
+
+```bash
+python learning_rate_analysis.py
+```
+
+在实验 5 的代码基础上复用训练函数，**同一份数据、同一个初始参数，只改学习率**，各训练 60 轮：
+
+实测结果：
+
+| 学习率 | 实际轮次 | 最终 Loss | 学到的 w | 学到的 b | 结果 |
+| --- | --- | --- | --- | --- | --- |
+| 0.01 | 60 | 0.590334 | 2.426 | 1.048 | 正常，但还没完全收敛 |
+| 0.1 | 60 | 0.506008 | 2.501 | 1.306 | 正常，收敛 |
+| 0.3 | 60 | 0.506008 | 2.501 | 1.306 | 正常，收敛 |
+| 0.5 | 13 | 1.600e+08 | 14337.832 | -588.447 | 第 13 轮发散 |
+| 1.0 | 6 | 1.426e+08 | -34015.055 | 1399.942 | 第 6 轮发散 |
+
+结论（详细分析见 [实验6_学习率分析.md](实验6_学习率分析.md)）：
+
+1. **学习率太小**（0.01）：Loss 平缓下降，60 轮还没到最低点，收敛慢、费时间；
+2. **学习率合适**（0.1）：前几轮陡降，第 40 轮后 Loss 稳定在 0.506008，参数基本等于真实值；
+3. **学习率偏大**（0.5、1.0）：步子跨过最低点，参数被越推越远，Loss 指数级增长成 `inf/nan`，训练失败；
+4. **判断收敛**：Loss 连续多轮几乎不变（变化 < 1e-6）+ 参数基本不动 + Loss 降到合理水平，三条同时满足即可。
+
+输出文件：
+
+| 文件 | 内容 |
+| --- | --- |
+| `output/figures/实验6_不同学习率Loss曲线.png` | 五个学习率的 Loss 曲线画在同一张图上（对数坐标） |
+| `output/figures/实验6_不同学习率拟合对比.png` | 五个学习率学到的直线与真实数据的对比 |
+| `output/实验6_不同学习率Loss数据.csv` | 每条曲线的原始数据 |
+
+## 九、CPU 与 GPU 的区别（验收问答）
 
 | 对比项 | CPU | GPU |
 | --- | --- | --- |

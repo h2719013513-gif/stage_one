@@ -1,5 +1,6 @@
 @echo off
 chcp 65001 >nul
+set PYTHONIOENCODING=utf-8
 set MPLCONFIGDIR=E:\conda_cache\matplotlib
 cd /d "%~dp0"
 echo ============================================================
