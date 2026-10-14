@@ -1,9 +1,11 @@
 # 深度学习实验：环境搭建 · 数据处理 · 张量与神经网络 · Git 管理
 
-本仓库是《深度学习》课程的实验提交成果，包含两个阶段：
+本仓库是《深度学习》课程的实验提交成果，包含三个阶段：
 
 - **第一阶段（实验 1～3）**：环境检测程序、数据处理与可视化、Git 项目管理；
-- **第二阶段（实验 4～6）**：PyTorch 张量与自动求导、从零实现线性回归训练、不同学习率的训练过程分析。
+- **第二阶段（实验 4～6）**：PyTorch 张量与自动求导、从零实现线性回归训练、不同学习率的训练过程分析；
+- **第三阶段（计算机视觉项目）**：基于 PyTorch 的 CIFAR-10 图像分类系统，见
+  [cifar10_classification/](cifar10_classification/README.md)（简单 CNN、训练/验证/测试、混淆矩阵、单张预测、结果可视化）。
 
 **仓库地址：** https://github.com/h2719013513-gif/stage_one
 
@@ -11,6 +13,7 @@
 
 ```
 stage_one/
+├── cifar10_classification/          计算机视觉项目：CIFAR-10 图像分类（含独立 README）
 ├── check_env.py                     实验 1：深度学习开发环境检测程序
 ├── data_analysis.py                 实验 2：数据读取 / 清洗 / 统计 / 可视化
 ├── tensor_practice.py               实验 4：张量操作与自动求导练习
@@ -18,6 +21,7 @@ stage_one/
 ├── learning_rate_analysis.py        实验 6：不同学习率的训练过程对比与分析
 ├── 实验6_学习率分析.md               实验 6 的分析报告
 ├── 实验步骤与常见问题.md             大白话版操作手册（怎么跑、出错怎么办）
+├── 实验4-6_步骤与常见问题.md         实验 4～6 的操作手册与问题排查
 ├── run_exp1_env_check.bat           一键运行脚本（双击即可，下同）
 ├── run_exp2_data_analysis.bat
 ├── run_exp4_tensor_practice.bat
